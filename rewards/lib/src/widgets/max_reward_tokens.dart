@@ -27,6 +27,9 @@ class MaxRewardTokens extends StatelessWidget {
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           return maxRewardTokensDisplayBuilder('${snapshot.data}');
+        } else if (snapshot.connectionState == ConnectionState.waiting) {
+          //if the stream is waiting, but no data, we need to resend the values
+          RewardInherited.of(context).rewardApi.resendValuesOnStreams();
         }
         return CircularProgressIndicator();
       },

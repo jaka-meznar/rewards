@@ -79,6 +79,10 @@ final class RewardCore {
       );
     }
     // Add the initial values to the streams
+    resendValuesOnStreams();
+  }
+
+  void resendValuesOnStreams() {
     _currentRewardTokensController.add(_currentRewardTokens);
     _maxRewardTokensController.add(_maxRewardTokens);
   }

@@ -16,9 +16,8 @@ class RewardApi {
          maxRewardTokens: maxRewardTokens,
          currentRewardTokens: currentRewardTokens,
        ) {
-    //TODO: watch if distinct would fuckup the first value
-    this.currentRewardTokens = _rewardCore.currentRewardTokensStream.distinct();
-    this.maxRewardTokens = _rewardCore.maxRewardTokensStream.distinct();
+    this.currentRewardTokens = _rewardCore.currentRewardTokensStream;
+    this.maxRewardTokens = _rewardCore.maxRewardTokensStream;
     _rewardCore.queryInitialState();
   }
 
@@ -40,5 +39,9 @@ class RewardApi {
 
   void dispose() {
     _rewardCore.dispose();
+  }
+
+  void resendValuesOnStreams() {
+    _rewardCore.resendValuesOnStreams();
   }
 }
