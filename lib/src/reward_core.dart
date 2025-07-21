@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:rewards/src/reward_query.dart';
 
+//TODO: there can be a state stream, which indicates that the reward tokens are being updated, and the stream can be used to show a loading indicator
+
 /// This is where the internal status resides
 final class RewardCore {
   /// The max number of reward tokens
@@ -38,9 +40,11 @@ final class RewardCore {
        _rewardQuery = rewardQuery {
     //adds the current values to the streams immediately
     _currentRewardTokensController.onListen = () {
+      print("listening for current reward tokens");
       _currentRewardTokensController.add(_currentRewardTokens);
     };
     _maxRewardTokensController.onListen = () {
+      print("listening for max reward tokens");
       _maxRewardTokensController.add(_maxRewardTokens);
     };
   }
