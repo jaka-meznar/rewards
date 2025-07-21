@@ -1,7 +1,7 @@
 ///At least number of reward tokens for a user and set the reward tokens for a user needs to be implemented
 abstract class RewardQuery {
   /// Get the currentnumber of reward tokens for a user
-  Future<int> getNumberOfRewardTokensForUser();
+  Future<int?> getNumberOfRewardTokensForUser();
 
   /// Set the number of reward tokens for a user
   Future<void> setNumberOfRewardTokensForUser(int numberOfRewardTokens);

@@ -9,6 +9,7 @@ sealed class RewardError extends Error {
   }
 }
 
+/// The error thrown when the user does not have enough reward tokens
 class NotEnoughRewardTokensError extends RewardError {
   NotEnoughRewardTokensError() : super('Not enough reward tokens');
 }

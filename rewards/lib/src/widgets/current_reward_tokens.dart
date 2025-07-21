@@ -25,9 +25,9 @@ class CurrentRewardTokens extends StatelessWidget {
           return tokenDisplayBuilder('${snapshot.data}');
         } else if (snapshot.connectionState == ConnectionState.waiting) {
           //if the stream is waiting, but no data, we need to resend the values
-          RewardInherited.of(context).rewardApi.resendValuesOnStreams();
+          //RewardInherited.of(context).rewardApi.resendValuesOnStreams();
         }
-        return CircularProgressIndicator();
+        return const CircularProgressIndicator();
       },
     );
   }

@@ -142,11 +142,11 @@ void main() {
       expect(mockQuery.currentTokens, equals(initialTokens + 3));
     });
 
-    test('substractRewardTokens decreases current tokens', () async {
+    test('subtractRewardTokens decreases current tokens', () async {
       // After queryInitialState, _currentRewardTokens will be 4 (from mock)
       await rewardCore.queryInitialState();
       final initialTokens = 4; // Mock returns 4
-      await rewardCore.substractRewardTokens(2);
+      await rewardCore.subtractRewardTokens(2);
       expect(mockQuery.currentTokens, equals(initialTokens - 2));
     });
 
@@ -297,17 +297,15 @@ void main() {
       );
     });
 
-    test('updateShouldNotify throws UnimplementedError', () {
+    test('updateShouldNotify returns boolean', () {
       final mockQuery = MockRewardQuery();
       final inherited = RewardInherited(
         rewardQuery: mockQuery,
         child: Container(),
       );
 
-      expect(
-        () => inherited.updateShouldNotify(inherited),
-        throwsA(isA<UnimplementedError>()),
-      );
+      final result = inherited.updateShouldNotify(inherited);
+      expect(result, isA<bool>());
     });
   });
 

@@ -2,6 +2,7 @@ import 'package:flutter/widgets.dart';
 import '../reward_api.dart';
 import '../reward_query.dart';
 
+/// The inherited widget for the reward api. This is used to access the reward api from the widget tree.
 class RewardInherited extends InheritedWidget {
   final RewardApi rewardApi;
 
@@ -29,7 +30,6 @@ class RewardInherited extends InheritedWidget {
 
   @override
   bool updateShouldNotify(covariant RewardInherited oldWidget) {
-    // TODO: implement updateShouldNotify
-    throw UnimplementedError();
+    return oldWidget.rewardApi != rewardApi;
   }
 }

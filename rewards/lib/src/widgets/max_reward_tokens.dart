@@ -23,15 +23,18 @@ class MaxRewardTokens extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<int>(
-      stream: RewardInherited.of(context).rewardApi.maxRewardTokens,
+      stream:
+          RewardInherited.of(context)
+              .rewardApi
+              .maxRewardTokens, //TODO: should likely be in a didChangeDependencies, which needs to be in a stateful widget
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           return maxRewardTokensDisplayBuilder('${snapshot.data}');
         } else if (snapshot.connectionState == ConnectionState.waiting) {
           //if the stream is waiting, but no data, we need to resend the values
-          RewardInherited.of(context).rewardApi.resendValuesOnStreams();
+          //RewardInherited.of(context).rewardApi.resendValuesOnStreams();
         }
-        return CircularProgressIndicator();
+        return const CircularProgressIndicator();
       },
     );
   }
