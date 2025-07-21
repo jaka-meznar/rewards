@@ -7,10 +7,13 @@ final class RewardApi {
   final RewardCore _rewardCore;
 
   ///the stream for updating the UI with the current reward tokens
-  late Stream<int> currentRewardTokens;
+  //late Stream<int> currentRewardTokens;
 
   ///the stream for updating the UI with the max reward tokens
-  late Stream<int> maxRewardTokens;
+  //late Stream<int> maxRewardTokens;
+
+  Stream<int> get currentRewardTokens => _rewardCore.currentRewardTokensStream;
+  Stream<int> get maxRewardTokens => _rewardCore.maxRewardTokensStream;
 
   ///if data for maxRewardTokens and currentRewardTokens cannot be queried (ie. first open), the constructor values are used
   RewardApi({
@@ -22,8 +25,8 @@ final class RewardApi {
          maxRewardTokens: maxRewardTokens,
          currentRewardTokens: currentRewardTokens,
        ) {
-    this.currentRewardTokens = _rewardCore.currentRewardTokensStream;
-    this.maxRewardTokens = _rewardCore.maxRewardTokensStream;
+    // this.currentRewardTokens = _rewardCore.currentRewardTokensStream;
+    // this.maxRewardTokens = _rewardCore.maxRewardTokensStream;
     // Query the initial state asynchronously
     _rewardCore.queryInitialState();
   }
