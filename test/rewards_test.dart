@@ -6,6 +6,7 @@ import 'package:rewards/src/reward_query.dart';
 import 'package:rewards/src/error/reward_error.dart';
 import 'package:rewards/src/widgets/current_reward_tokens.dart';
 import 'package:rewards/src/widgets/max_reward_tokens.dart';
+import 'package:rewards/src/widgets/merged_reward_tokens.dart';
 import 'package:rewards/src/widgets/reward_inherited.dart';
 
 // Helper for robust widget async waiting
@@ -382,6 +383,195 @@ void main() {
       // Wait for the max token text to appear
       await pumpUntilFound(tester, find.text('Max: 10'));
       expect(find.text('Max: 10'), findsOneWidget);
+    });
+  });
+
+  group('MergedRewardTokens Widget Tests', () {
+    testWidgets('shows CircularProgressIndicator initially', (tester) async {
+      final mockQuery = MockRewardQuery();
+      await tester.pumpWidget(
+        MaterialApp(
+          home: RewardInherited(
+            rewardQuery: mockQuery,
+            child: MergedRewardTokens(
+              mergedRewardTokensDisplayBuilder:
+                  (current, max) => Text('Current: $current, Max: $max'),
+            ),
+          ),
+        ),
+      );
+
+      // Initially should show loading indicator
+      expect(find.byType(CircularProgressIndicator), findsOneWidget);
+    });
+
+    testWidgets('displays merged tokens after data loads', (tester) async {
+      final mockQuery = MockRewardQuery();
+      await tester.pumpWidget(
+        MaterialApp(
+          home: RewardInherited(
+            rewardQuery: mockQuery,
+            maxRewardTokens: 10,
+            child: MergedRewardTokens(
+              mergedRewardTokensDisplayBuilder:
+                  (current, max) => Text('Current: $current, Max: $max'),
+            ),
+          ),
+        ),
+      );
+
+      // Wait for the merged token text to appear
+      await pumpUntilFound(tester, find.text('Current: 4, Max: 10'));
+      expect(find.text('Current: 4, Max: 10'), findsOneWidget);
+    });
+
+    testWidgets('calls builder with correct parameters', (tester) async {
+      final mockQuery = MockRewardQuery();
+      String? capturedCurrent;
+      String? capturedMax;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: RewardInherited(
+            rewardQuery: mockQuery,
+            maxRewardTokens: 15,
+            child: MergedRewardTokens(
+              mergedRewardTokensDisplayBuilder: (current, max) {
+                capturedCurrent = current;
+                capturedMax = max;
+                return Text('$current/$max');
+              },
+            ),
+          ),
+        ),
+      );
+
+      // Wait for the widget to load data
+      await pumpUntilFound(tester, find.text('4/15'));
+
+      expect(capturedCurrent, equals('4'));
+      expect(capturedMax, equals('15'));
+    });
+
+    testWidgets('updates when streams emit new values', (tester) async {
+      final mockQuery = MockRewardQuery();
+      await tester.pumpWidget(
+        MaterialApp(
+          home: RewardInherited(
+            rewardQuery: mockQuery,
+            maxRewardTokens: 10,
+            child: MergedRewardTokens(
+              mergedRewardTokensDisplayBuilder:
+                  (current, max) => Text('$current/$max'),
+            ),
+          ),
+        ),
+      );
+
+      // Wait for initial data
+      await pumpUntilFound(tester, find.text('4/10'));
+
+      // Update the mock query values
+      await mockQuery.setNumberOfRewardTokensForUser(7);
+      mockQuery.setMaxTokens(20);
+
+      // Rebuild the widget to trigger new stream values
+      await tester.pumpWidget(
+        MaterialApp(
+          home: RewardInherited(
+            rewardQuery: mockQuery,
+            maxRewardTokens: 20,
+            child: MergedRewardTokens(
+              mergedRewardTokensDisplayBuilder:
+                  (current, max) => Text('$current/$max'),
+            ),
+          ),
+        ),
+      );
+
+      // Wait for updated data
+      await pumpUntilFound(tester, find.text('7/20'));
+      expect(find.text('7/20'), findsOneWidget);
+    });
+
+    testWidgets('handles zero values correctly', (tester) async {
+      final mockQuery = MockRewardQuery();
+      // Set initial values to 0
+      await mockQuery.setNumberOfRewardTokensForUser(0);
+      mockQuery.setMaxTokens(0);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: RewardInherited(
+            rewardQuery: mockQuery,
+            maxRewardTokens: 0,
+            child: MergedRewardTokens(
+              mergedRewardTokensDisplayBuilder:
+                  (current, max) => Text('Current: $current, Max: $max'),
+            ),
+          ),
+        ),
+      );
+
+      // Wait for the zero values to appear
+      await pumpUntilFound(tester, find.text('Current: 0, Max: 0'));
+      expect(find.text('Current: 0, Max: 0'), findsOneWidget);
+    });
+
+    testWidgets('handles large numbers correctly', (tester) async {
+      final mockQuery = MockRewardQuery();
+      await mockQuery.setNumberOfRewardTokensForUser(999999);
+      mockQuery.setMaxTokens(1000000);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: RewardInherited(
+            rewardQuery: mockQuery,
+            maxRewardTokens: 1000000,
+            child: MergedRewardTokens(
+              mergedRewardTokensDisplayBuilder:
+                  (current, max) => Text('$current/$max'),
+            ),
+          ),
+        ),
+      );
+
+      // Wait for the large numbers to appear
+      await pumpUntilFound(tester, find.text('999999/1000000'));
+      expect(find.text('999999/1000000'), findsOneWidget);
+    });
+
+    testWidgets('builder function is called with string parameters', (
+      tester,
+    ) async {
+      final mockQuery = MockRewardQuery();
+      bool builderCalled = false;
+      String? firstParamType;
+      String? secondParamType;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: RewardInherited(
+            rewardQuery: mockQuery,
+            maxRewardTokens: 10,
+            child: MergedRewardTokens(
+              mergedRewardTokensDisplayBuilder: (current, max) {
+                builderCalled = true;
+                firstParamType = current.runtimeType.toString();
+                secondParamType = max.runtimeType.toString();
+                return Text('$current/$max');
+              },
+            ),
+          ),
+        ),
+      );
+
+      // Wait for the widget to load data
+      await pumpUntilFound(tester, find.text('4/10'));
+
+      expect(builderCalled, isTrue);
+      expect(firstParamType, equals('String'));
+      expect(secondParamType, equals('String'));
     });
   });
 

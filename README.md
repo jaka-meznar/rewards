@@ -40,6 +40,17 @@ from the package authors, and more.
 
 
 ## Example
-1. implement the RewardQuery
+1. implement the RewardQuery (and functions that you need)
 2. hug your widget tree with RewardInherited
+eg:
+child: MaterialApp.router(
+    ...
+    builder: ...
+        child: RewardInherited(
+            rewardQuery: RewardQueryImplementation(
+                someDependency: _myDependency,
+            ),
+            child: child!,
+            ),
+    ...
 3. 
