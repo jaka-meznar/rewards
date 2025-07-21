@@ -135,12 +135,63 @@ void main() {
       // Note: We can't directly test the private field, but we can test through streams
     });
 
-    test('addRewardTokens increases current tokens', () async {
+    test('addRewardTokens increases tokens up to max', () async {
       // After queryInitialState, _currentRewardTokens will be 4 (from mock)
       await rewardCore.queryInitialState();
       final initialTokens = 4; // Mock returns 4
+      final maxTokens = 10;
+
+      // Add tokens normally
       await rewardCore.addRewardTokens(3);
       expect(mockQuery.currentTokens, equals(initialTokens + 3));
+
+      // Add tokens that would exceed max - should cap at max
+      await rewardCore.addRewardTokens(10);
+      expect(mockQuery.currentTokens, equals(maxTokens));
+    });
+
+    test('addRewardTokens caps at max tokens', () async {
+      await rewardCore.queryInitialState();
+      final maxTokens = 10;
+
+      // Try to add more than max tokens
+      await rewardCore.addRewardTokens(15);
+      expect(mockQuery.currentTokens, equals(maxTokens));
+    });
+
+    test('topUpRewardTokens sets tokens to max', () async {
+      await rewardCore.queryInitialState();
+      final maxTokens = 10;
+
+      // Top up should set current tokens to max
+      await rewardCore.topUpRewardTokens();
+      expect(mockQuery.currentTokens, equals(maxTokens));
+    });
+
+    test('topUpRewardTokens works when current tokens are below max', () async {
+      await rewardCore.queryInitialState();
+      final maxTokens = 10;
+      final initialTokens = 4; // Mock returns 4
+
+      // Verify initial state
+      expect(mockQuery.currentTokens, equals(initialTokens));
+
+      // Top up should set to max
+      await rewardCore.topUpRewardTokens();
+      expect(mockQuery.currentTokens, equals(maxTokens));
+    });
+
+    test('topUpRewardTokens works when current tokens are at max', () async {
+      await rewardCore.queryInitialState();
+      final maxTokens = 10;
+
+      // First top up to max
+      await rewardCore.topUpRewardTokens();
+      expect(mockQuery.currentTokens, equals(maxTokens));
+
+      // Top up again - should still be at max
+      await rewardCore.topUpRewardTokens();
+      expect(mockQuery.currentTokens, equals(maxTokens));
     });
 
     test('subtractRewardTokens decreases current tokens', () async {
@@ -204,14 +255,76 @@ void main() {
       );
     });
 
-    test('addRewardTokens increases tokens', () async {
+    test('addRewardTokens increases tokens up to max', () async {
       // Wait for initial state to be loaded
       await Future.delayed(Duration(milliseconds: 10));
       final initialTokens =
           mockQuery.currentTokens; // Should be 4 after queryInitialState
+      final maxTokens = 10;
+
+      // Add tokens normally
       rewardApi.addRewardTokens(3);
       await Future.delayed(Duration(milliseconds: 10));
       expect(mockQuery.currentTokens, equals(initialTokens + 3));
+
+      // Add tokens that would exceed max - should cap at max
+      rewardApi.addRewardTokens(10);
+      await Future.delayed(Duration(milliseconds: 10));
+      expect(mockQuery.currentTokens, equals(maxTokens));
+    });
+
+    test('addRewardTokens caps at max tokens', () async {
+      // Wait for initial state to be loaded
+      await Future.delayed(Duration(milliseconds: 10));
+      final maxTokens = 10;
+
+      // Try to add more than max tokens
+      rewardApi.addRewardTokens(15);
+      await Future.delayed(Duration(milliseconds: 10));
+      expect(mockQuery.currentTokens, equals(maxTokens));
+    });
+
+    test('topUpRewardTokens sets tokens to max', () async {
+      // Wait for initial state to be loaded
+      await Future.delayed(Duration(milliseconds: 10));
+      final maxTokens = 10;
+
+      // Top up should set current tokens to max
+      rewardApi.topUpRewardTokens();
+      await Future.delayed(Duration(milliseconds: 10));
+      expect(mockQuery.currentTokens, equals(maxTokens));
+    });
+
+    test('topUpRewardTokens works when current tokens are below max', () async {
+      // Wait for initial state to be loaded
+      await Future.delayed(Duration(milliseconds: 10));
+      final maxTokens = 10;
+      final initialTokens =
+          mockQuery.currentTokens; // Should be 4 after queryInitialState
+
+      // Verify initial state
+      expect(mockQuery.currentTokens, equals(initialTokens));
+
+      // Top up should set to max
+      rewardApi.topUpRewardTokens();
+      await Future.delayed(Duration(milliseconds: 10));
+      expect(mockQuery.currentTokens, equals(maxTokens));
+    });
+
+    test('topUpRewardTokens works when current tokens are at max', () async {
+      // Wait for initial state to be loaded
+      await Future.delayed(Duration(milliseconds: 10));
+      final maxTokens = 10;
+
+      // First top up to max
+      rewardApi.topUpRewardTokens();
+      await Future.delayed(Duration(milliseconds: 10));
+      expect(mockQuery.currentTokens, equals(maxTokens));
+
+      // Top up again - should still be at max
+      rewardApi.topUpRewardTokens();
+      await Future.delayed(Duration(milliseconds: 10));
+      expect(mockQuery.currentTokens, equals(maxTokens));
     });
 
     test('queryRewardTokens calls queryInitialState', () async {
@@ -591,19 +704,29 @@ void main() {
         equals(4),
       ); // Mock default after queryInitialState
 
-      // Add tokens
+      // Add tokens normally
       rewardApi.addRewardTokens(3);
       await Future.delayed(Duration(milliseconds: 10));
       expect(mockQuery.currentTokens, equals(7));
 
+      // Add tokens that would exceed max - should cap at max
+      rewardApi.addRewardTokens(5);
+      await Future.delayed(Duration(milliseconds: 10));
+      expect(mockQuery.currentTokens, equals(10));
+
       // Use tokens successfully
       rewardApi.useRewardTokens(2);
       await Future.delayed(Duration(milliseconds: 10));
-      expect(mockQuery.currentTokens, equals(5));
+      expect(mockQuery.currentTokens, equals(8));
+
+      // Top up to max
+      rewardApi.topUpRewardTokens();
+      await Future.delayed(Duration(milliseconds: 10));
+      expect(mockQuery.currentTokens, equals(10));
 
       // Try to use too many tokens
       expect(
-        () => rewardApi.useRewardTokens(10),
+        () => rewardApi.useRewardTokens(15),
         throwsA(isA<NotEnoughRewardTokensError>()),
       );
 
@@ -638,6 +761,45 @@ void main() {
 
       expect(currentTokens.length, greaterThan(1));
       expect(maxTokens.length, greaterThan(0));
+
+      rewardApi.dispose();
+    });
+
+    test('topUpRewardTokens integration with streams', () async {
+      final mockQuery = MockRewardQuery();
+      final rewardApi = RewardApi(
+        rewardQuery: mockQuery,
+        maxRewardTokens: 10,
+        currentRewardTokens: 5,
+      );
+
+      final currentTokens = <int>[];
+
+      rewardApi.currentRewardTokens.listen(currentTokens.add);
+
+      // Wait for initial state
+      await Future.delayed(Duration(milliseconds: 10));
+
+      // Verify initial state
+      expect(currentTokens.last, equals(4)); // Mock returns 4
+
+      // Top up to max
+      rewardApi.topUpRewardTokens();
+      await Future.delayed(Duration(milliseconds: 10));
+
+      // Verify top up worked
+      expect(currentTokens.last, equals(10));
+      expect(mockQuery.currentTokens, equals(10));
+
+      // Use some tokens
+      rewardApi.useRewardTokens(3);
+      await Future.delayed(Duration(milliseconds: 10));
+      expect(currentTokens.last, equals(7));
+
+      // Top up again
+      rewardApi.topUpRewardTokens();
+      await Future.delayed(Duration(milliseconds: 10));
+      expect(currentTokens.last, equals(10));
 
       rewardApi.dispose();
     });

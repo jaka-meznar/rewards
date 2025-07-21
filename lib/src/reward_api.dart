@@ -37,7 +37,7 @@ final class RewardApi {
     }
   }
 
-  ///adds the given amount to the current reward tokens
+  ///adds the given amount to the current reward tokens. If the amount + current is greater than the max, the max is used.
   void addRewardTokens(int amount) {
     _rewardCore.addRewardTokens(amount);
   }
@@ -55,5 +55,9 @@ final class RewardApi {
   ///resends the values on the streams (ie. if the streams are setup before the widget completes)
   void resendValuesOnStreams() {
     _rewardCore.resendValuesOnStreams();
+  }
+
+  void topUpRewardTokens() {
+    _rewardCore.topUpRewardTokens();
   }
 }

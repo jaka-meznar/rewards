@@ -56,12 +56,32 @@ final class RewardCore {
   }
 
   /// Adds the given amount to the current reward tokens
-  Future<void> addRewardTokens(int amount) async {
+  Future<void> topUpRewardTokens() async {
     await _rewardQuery
-        .setNumberOfRewardTokensForUser(_currentRewardTokens + amount)
+        .setNumberOfRewardTokensForUser(_maxRewardTokens)
         .then(
           (_) {
-            _currentRewardTokens += amount;
+            _currentRewardTokens = _maxRewardTokens;
+            _currentRewardTokensController.add(_currentRewardTokens);
+          },
+          onError: (error, stackTrace) {
+            _currentRewardTokensController.addError(error);
+          },
+        );
+  }
+
+  /// Adds the given amount to the current reward tokens
+  Future<void> addRewardTokens(int amount) async {
+    //fixes to the max amount
+    var calculatedAmount = amount + _currentRewardTokens;
+    if (calculatedAmount > _maxRewardTokens) {
+      calculatedAmount = _maxRewardTokens;
+    }
+    await _rewardQuery
+        .setNumberOfRewardTokensForUser(calculatedAmount)
+        .then(
+          (_) {
+            _currentRewardTokens = calculatedAmount;
             _currentRewardTokensController.add(_currentRewardTokens);
           },
           onError: (error, stackTrace) {
