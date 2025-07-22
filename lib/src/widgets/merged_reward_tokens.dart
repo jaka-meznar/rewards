@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 import 'reward_inherited.dart';
 
-class MergedRewardTokens extends StatelessWidget {
+class MergedRewardTokens extends StatefulWidget {
   const MergedRewardTokens({
     super.key,
     required this.mergedRewardTokensDisplayBuilder,
@@ -16,6 +16,11 @@ class MergedRewardTokens extends StatelessWidget {
   mergedRewardTokensDisplayBuilder;
 
   @override
+  State<MergedRewardTokens> createState() => _MergedRewardTokensState();
+}
+
+class _MergedRewardTokensState extends State<MergedRewardTokens> {
+  @override
   Widget build(BuildContext context) {
     return StreamBuilder<List<int>>(
       stream: StreamZip([
@@ -24,7 +29,7 @@ class MergedRewardTokens extends StatelessWidget {
       ]),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
-          return mergedRewardTokensDisplayBuilder(
+          return widget.mergedRewardTokensDisplayBuilder(
             '${snapshot.data![0]}', // current tokens
             '${snapshot.data![1]}', // max tokens
           );
