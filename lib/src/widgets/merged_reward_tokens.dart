@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 import 'reward_inherited.dart';
 
-class MergedRewardTokens extends StatefulWidget {
+class MergedRewardTokens extends StatelessWidget {
   const MergedRewardTokens({
     super.key,
     required this.mergedRewardTokensDisplayBuilder,
@@ -16,11 +16,6 @@ class MergedRewardTokens extends StatefulWidget {
   mergedRewardTokensDisplayBuilder;
 
   @override
-  State<MergedRewardTokens> createState() => _MergedRewardTokensState();
-}
-
-class _MergedRewardTokensState extends State<MergedRewardTokens> {
-  @override
   Widget build(BuildContext context) {
     return StreamBuilder<List<int>>(
       stream: StreamZip([
@@ -28,10 +23,10 @@ class _MergedRewardTokensState extends State<MergedRewardTokens> {
         RewardInherited.of(context).rewardApi.maxRewardTokens,
       ]),
       builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          return widget.mergedRewardTokensDisplayBuilder(
-            '${snapshot.data![0]}', // current tokens
-            '${snapshot.data![1]}', // max tokens
+        if (snapshot.hasData || snapshot.requireData.isNotEmpty) {
+          return mergedRewardTokensDisplayBuilder(
+            '${snapshot.data?[0] ?? snapshot.requireData[0]}', // current tokens
+            '${snapshot.data?[1] ?? snapshot.requireData[1]}', // max tokens
           );
         }
         return const CircularProgressIndicator();
