@@ -18,10 +18,10 @@ class MergedRewardTokens extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<List<int>>(
-      stream: StreamZip([
+      stream: _combineLatest(
         RewardInherited.of(context).rewardApi.currentRewardTokens,
         RewardInherited.of(context).rewardApi.maxRewardTokens,
-      ]),
+      ),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           return mergedRewardTokensDisplayBuilder(
@@ -35,5 +35,14 @@ class MergedRewardTokens extends StatelessWidget {
         return const CircularProgressIndicator();
       },
     );
+  }
+
+  Stream<List<int>> _combineLatest(Stream<int> stream1, Stream<int> stream2) {
+    return StreamGroup.merge([stream1, stream2]).asyncMap((_) async {
+      // Get the latest values from both streams
+      final currentTokens = await stream1.first;
+      final maxTokens = await stream2.first;
+      return [currentTokens, maxTokens];
+    });
   }
 }
