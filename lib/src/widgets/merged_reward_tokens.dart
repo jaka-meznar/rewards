@@ -23,11 +23,14 @@ class MergedRewardTokens extends StatelessWidget {
         RewardInherited.of(context).rewardApi.maxRewardTokens,
       ]),
       builder: (context, snapshot) {
-        if (snapshot.hasData || snapshot.requireData.isNotEmpty) {
+        if (snapshot.hasData) {
           return mergedRewardTokensDisplayBuilder(
-            '${snapshot.data?[0] ?? snapshot.requireData[0]}', // current tokens
-            '${snapshot.data?[1] ?? snapshot.requireData[1]}', // max tokens
+            '${snapshot.data![0]}', // current tokens
+            '${snapshot.data![1]}', // max tokens
           );
+        } else if (snapshot.connectionState == ConnectionState.waiting) {
+          //if the stream is waiting, but no data, we need to resend the values
+          RewardInherited.of(context).rewardApi.resendValuesOnStreams();
         }
         return const CircularProgressIndicator();
       },
