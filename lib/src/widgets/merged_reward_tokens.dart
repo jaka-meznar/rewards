@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 
 import 'reward_inherited.dart';
 
+//TODO: need to find a way to merge the streams without outside dependency.
+//Stream zip does not work as both streams need to emit.
+
 class MergedRewardTokens extends StatelessWidget {
   const MergedRewardTokens({
     super.key,
@@ -44,8 +47,8 @@ class MergedRewardTokens extends StatelessWidget {
   Stream<List<int>> _combineLatest(Stream<int> stream1, Stream<int> stream2) {
     return StreamGroup.mergeBroadcast([stream1, stream2]).asyncMap((_) async {
       // Get the latest values from both streams
-      final currentTokens = await stream1.first;
-      final maxTokens = await stream2.first;
+      final currentTokens = await stream1.last;
+      final maxTokens = await stream2.last;
       return [currentTokens, maxTokens];
     });
   }
