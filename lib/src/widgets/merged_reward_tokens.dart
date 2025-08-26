@@ -47,6 +47,6 @@ class MergedRewardTokens extends StatelessWidget {
       final currentTokens = await stream1.last;
       final maxTokens = await stream2.last;
       return [currentTokens, maxTokens];
-    });
+    }).asBroadcastStream();
   }
 }
