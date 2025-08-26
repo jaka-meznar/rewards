@@ -33,7 +33,7 @@ class CurrentMergedRewardTokens extends StatelessWidget {
           tokenDisplayBuilder:
               (currentTokens) => Text(currentTokens, style: textStyle),
         ),
-        Text("/"),
+        Text("/", style: textStyle),
         MaxRewardTokens(
           maxRewardTokensDisplayBuilder:
               (maxTokens) => Text(maxTokens, style: textStyle),
