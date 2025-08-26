@@ -42,11 +42,11 @@ class MergedRewardTokens extends StatelessWidget {
   }
 
   Stream<List<int>> _combineLatest(Stream<int> stream1, Stream<int> stream2) {
-    return StreamGroup.merge([stream1, stream2]).asyncMap((_) async {
+    return StreamGroup.mergeBroadcast([stream1, stream2]).asyncMap((_) async {
       // Get the latest values from both streams
       final currentTokens = await stream1.last;
       final maxTokens = await stream2.last;
       return [currentTokens, maxTokens];
-    }).asBroadcastStream();
+    });
   }
 }
