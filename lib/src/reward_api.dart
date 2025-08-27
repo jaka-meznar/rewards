@@ -63,4 +63,10 @@ final class RewardApi {
   void topUpRewardTokens() {
     _rewardCore.topUpRewardTokens();
   }
+
+  void canUseRewardTokensThrowOtherwise(int amount) {
+    if (!_rewardCore.canUseRewardTokens(amount)) {
+      throw NotEnoughRewardTokensError();
+    }
+  }
 }
