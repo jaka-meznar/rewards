@@ -12,11 +12,16 @@ class RewardInherited extends InheritedWidget {
     required RewardQuery rewardQuery,
     int maxRewardTokens = 0,
     int currentRewardTokens = 0,
+    bool topUpRewardTokensFirstRun = false,
   }) : rewardApi = RewardApi(
          rewardQuery: rewardQuery,
          maxRewardTokens: maxRewardTokens,
          currentRewardTokens: currentRewardTokens,
-       );
+       ) {
+    if (topUpRewardTokensFirstRun) {
+      rewardApi.topUpRewardTokensFirstRun();
+    }
+  }
 
   static RewardInherited? maybeOf(BuildContext context) {
     return context.dependOnInheritedWidgetOfExactType<RewardInherited>();
