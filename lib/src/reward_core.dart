@@ -40,11 +40,11 @@ final class RewardCore {
        _rewardQuery = rewardQuery {
     //adds the current values to the streams immediately
     _currentRewardTokensController.onListen = () {
-      print("listening for current reward tokens");
+      //print("listening for current reward tokens");
       _currentRewardTokensController.add(_currentRewardTokens);
     };
     _maxRewardTokensController.onListen = () {
-      print("listening for max reward tokens");
+      //print("listening for max reward tokens");
       _maxRewardTokensController.add(_maxRewardTokens);
     };
   }
@@ -146,5 +146,10 @@ final class RewardCore {
     _currentRewardTokensController.close();
     _maxRewardTokensController.close();
     _rewardQuery.dispose();
+  }
+
+  /// Top up the reward tokens for a user on the first run
+  void topUpRewardTokensFirstRun() {
+    _rewardQuery.topUpRewardTokensFirstRun(_maxRewardTokens);
   }
 }

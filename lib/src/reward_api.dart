@@ -69,4 +69,8 @@ final class RewardApi {
       throw NotEnoughRewardTokensError();
     }
   }
+
+  void topUpRewardTokensFirstRun() {
+    _rewardCore.topUpRewardTokensFirstRun();
+  }
 }

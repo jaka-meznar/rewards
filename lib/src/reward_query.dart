@@ -11,5 +11,8 @@ abstract class RewardQuery {
     return null;
   }
 
+  /// Optional. Top up the reward tokens for a user on the first run.
+  Future<void> topUpRewardTokensFirstRun(int numberOfRewardTokens) async {}
+
   Future<void> dispose() async {}
 }
