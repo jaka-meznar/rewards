@@ -1,6 +1,6 @@
 name: rewards
 description: "helper package for managing reward tokens"
-version: 0.0.13
+version: 0.0.14
 homepage:
 
 environment:
