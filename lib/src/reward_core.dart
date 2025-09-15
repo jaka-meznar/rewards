@@ -150,7 +150,8 @@ final class RewardCore {
 
   /// Top up the reward tokens for a user on the first run
   void topUpRewardTokensFirstRun() async {
-    await _rewardQuery.topUpRewardTokensFirstRun(_maxRewardTokens);
-    resendValuesOnStreams();
+    await _rewardQuery.topUpRewardTokensFirstRun(_maxRewardTokens).then((_) {
+      queryInitialState();
+    });
   }
 }
